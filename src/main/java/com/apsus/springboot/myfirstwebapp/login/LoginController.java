@@ -44,6 +44,8 @@ public class LoginController {
 	public String loginJSP() {
 		return "login";
 	}
+
+
 	@RequestMapping(value="login", method = RequestMethod.POST)
 	public String gotToWelcomePage(@RequestParam String name, @RequestParam String password, ModelMap model) {
 		if(this.authenticationService.authenticate(name, password)) {

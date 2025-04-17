@@ -4,11 +4,12 @@
 		<title>Welcome Page </title>
 	</head>
 	<body>
-		<H1>Welcome to the Spring MVC Framework</H1>
-		<p>
-				Hello ${name}
-		</p>
-		<p><a href="todos">Manage</a> your Todos</p>
+		<div class="container">
+			<h1>Welcome ${name}</h1>
+			<hr>
+			<p><a href="todos">Manage</a> your Todos</p>
+
+		</div>
 	</body>
 	
 <html>
