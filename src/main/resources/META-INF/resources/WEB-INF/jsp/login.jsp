@@ -1,11 +1,17 @@
+
 <html>
 	<head>
 		<title>Login JSP </title>
 	</head>
 	<body>
-		<h1>Test!!</h1>
-		<p> this is the login page in jsp</p>
-		<p> Welcome ${name} and your age is ${age} </p>
+		<h1>Login JSP </h1>
+		<pre>${error}</pre>
+	  <form method="post">
+			  Name: <input type="text" name="name">
+			  Password: <input type="password" name="password">
+			  <input type="submit">
+	  </form>
+
 	</body>
 	
 <html>
