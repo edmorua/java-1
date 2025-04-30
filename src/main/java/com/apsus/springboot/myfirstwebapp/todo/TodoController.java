@@ -1,7 +1,10 @@
 package com.apsus.springboot.myfirstwebapp.todo;
 
+import jakarta.validation.Valid;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -29,14 +32,44 @@ public class TodoController {
   }
 
   @RequestMapping(value="/add-todo", method = RequestMethod.GET)
-  public String showAddTodoPage() {
+  public String showAddTodoPage(ModelMap model) {
+    String name = (String) model.get("name");
+    Todo todo = new Todo(0, name, "", LocalDate.now().plusYears(1), false );
+    model.put("todo", todo);
     return "todo";
   }
   @RequestMapping(value="/add-todo", method = RequestMethod.POST)
-  public String addNewTodo(@RequestParam String description, ModelMap model){
+  public String addNewTodo(ModelMap model, @Valid Todo todo, BindingResult bindingResult){
     String username = (String) model.get("name");
-    todoService.addTodo(username, description, LocalDate.now().plusYears(1), false);
+    if(bindingResult.hasErrors()) {
+      return "todo";
+    }
+    todoService.addTodo(username, todo.getDescription(), todo.getTargetDate(), false);
     return "redirect:/todos";
+  }
+
+  @RequestMapping(value = "/delete-todo")
+  public String deleteTodo(@RequestParam int id) {
+    todoService.removeTodo(id);
+    return "redirect:/todos";
+  }
+
+  @RequestMapping(value="/update-todo", method = RequestMethod.POST)
+  public String updateTodo(ModelMap model, @Valid Todo todo, BindingResult bindingResult) {
+    String username = (String) model.get("name");
+    if(bindingResult.hasErrors()) {
+      return "todo";
+    }
+    todo.setUsername(username);
+    todoService.updateTodo(todo);
+    return "redirect:/todos";
+  }
+
+  @RequestMapping(value= "/update-todo", method = RequestMethod.GET)
+  public String showUpdateTodo(@RequestParam int id, ModelMap model) {
+    Todo todo = todoService.findById(id);
+    model.put("todo", todo);
+    return "todo";
   }
 
 }
