@@ -1,6 +1,8 @@
 package com.apsus.springboot.myfirstwebapp.todo;
 
 import jakarta.validation.Valid;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
@@ -25,7 +27,7 @@ public class TodoController {
 
   @RequestMapping(value="/todos", method = RequestMethod.GET)
   public String listAllTodos(ModelMap model) {
-    String name = (String) model.get("name");
+    String name = getLoggedInUsername();
     List<Todo> todos = this.todoService.findByUsername(name);
     model.addAttribute("todos", todos);
     return "listTodos";
@@ -33,19 +35,24 @@ public class TodoController {
 
   @RequestMapping(value="/add-todo", method = RequestMethod.GET)
   public String showAddTodoPage(ModelMap model) {
-    String name = (String) model.get("name");
+    String name = getLoggedInUsername();
     Todo todo = new Todo(0, name, "", LocalDate.now().plusYears(1), false );
     model.put("todo", todo);
     return "todo";
   }
   @RequestMapping(value="/add-todo", method = RequestMethod.POST)
   public String addNewTodo(ModelMap model, @Valid Todo todo, BindingResult bindingResult){
-    String username = (String) model.get("name");
+    String username = getLoggedInUsername();
     if(bindingResult.hasErrors()) {
       return "todo";
     }
     todoService.addTodo(username, todo.getDescription(), todo.getTargetDate(), false);
     return "redirect:/todos";
+  }
+
+  private static String getUsername(ModelMap model) {
+    Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+    return auth.getName();
   }
 
   @RequestMapping(value = "/delete-todo")
@@ -56,7 +63,7 @@ public class TodoController {
 
   @RequestMapping(value="/update-todo", method = RequestMethod.POST)
   public String updateTodo(ModelMap model, @Valid Todo todo, BindingResult bindingResult) {
-    String username = (String) model.get("name");
+    String username = getLoggedInUsername();
     if(bindingResult.hasErrors()) {
       return "todo";
     }
@@ -71,5 +78,8 @@ public class TodoController {
     model.put("todo", todo);
     return "todo";
   }
-
+  private String getLoggedInUsername(){
+    Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+    return auth.getName();
+  }
 }
